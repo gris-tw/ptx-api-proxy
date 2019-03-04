@@ -1,13 +1,18 @@
 package main
 
 import (
-	"io/ioutil"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/hpcslag/Sample-code/Golang/lib"
 )
 
 func main() {
+
+	ptxapi := lib.PTXService{
+		AppID:  "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
+		AppKey: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
+	}
+
 	r := gin.Default()
 	r.GET("/proxy-api", func(c *gin.Context) {
 		c.String(200, "Proxy is working.")
@@ -16,19 +21,10 @@ func main() {
 	r.POST("/ptx-service", func(c *gin.Context) {
 
 		apiurl := c.PostForm("apiString")
-		req, err := http.NewRequest("GET", apiurl, nil)
-		req.Header.Set("Content-Type", "application/json")
 
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			panic(err)
-		}
-		defer resp.Body.Close()
+		response := ptxapi.Get(apiurl)
 
-		body, _ := ioutil.ReadAll(resp.Body)
-
-		c.String(200, string(body))
+		c.String(200, response)
 	})
 
 	r.Run(":80")
